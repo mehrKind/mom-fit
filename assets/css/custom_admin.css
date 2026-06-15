@@ -1,0 +1,21 @@
+
+
+/* Customize the main navigation */
+#nav-sidebar {
+    background: transparent !important;
+}
+
+#nav-sidebar .module caption {
+    background: #37928D !important;
+    color: white !important;
+    padding: 10px !important;
+}
+
+/* Custom brand text */
+#branding h1 {
+    font-weight: bold !important;
+    font-size: 2.5rem;
+}
+/* #branding h1 a{
+    color: #BE5258 !important;
+} */

@@ -1,0 +1,603 @@
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (_) => EditProfilePage(userData: _userData)),
+).then((updated) {
+  if (updated == true) {
+    fetchUserProfile(); // این تابع توی HomePage
+  }
+});
+
+---------------------------------------------------------------------------------------
+import 'package:flutter/material.dart';
+import 'package:mom_fit/router/back_widget.dart';
+import 'package:video_player/video_player.dart';
+import 'dart:async';
+import 'package:chewie/chewie.dart';
+
+class ExercisesPage extends StatefulWidget{
+  final Map<String, dynamic> exercise;
+  const ExercisesPage({super.key, required this.exercise});
+
+  @override
+  State<ExercisesPage> createState() => _ExercisesPage();
+}
+enum ExercisePhase { idle, runningSet, waitingRest, resting, videoRest }
+
+class _ExercisesPage extends State<ExercisesPage> {
+
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
+  ExercisePhase _phase = ExercisePhase.idle;
+
+  bool _isStarted = false;
+  Timer? _setTimer;
+  bool isResting = false;
+  int currentVideoIndex = 0;
+  int currentSetIndex = 0;
+  bool _isPaused = false;
+  int remainingSeconds = 0;
+
+
+
+
+  int _parseDuration(String duration) {
+    final parts = duration.split(":").map(int.parse).toList();
+    if (parts.length == 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length == 2) {
+      return parts[0] * 60 + parts[1];
+    }
+    return 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    final currentVideo = videos.isNotEmpty ? videos[currentVideoIndex] : null;
+    final sets = currentVideo != null ? currentVideo["sets"] as List<dynamic> : [];
+    _initializeVideo();
+  }
+
+  void _onStart() {
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    if (videos.isEmpty) return;
+
+    final currentVideo = videos[currentVideoIndex];
+    final sets = currentVideo["sets"] as List<dynamic>;
+    if (currentSetIndex >= sets.length) return;
+
+    final currentSet = sets[currentSetIndex];
+    final int duration = currentSet["duration_seconds"];
+
+    setState(() {
+      _phase = ExercisePhase.runningSet;   // وارد فاز اجرای ست
+      remainingSeconds = duration;         // تایمر ست
+      _isStarted = true;
+      _isPaused = false;
+    });
+
+    _videoController?.play();
+
+    _setTimer?.cancel();
+    _setTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds > 0) {
+        setState(() {
+          remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _phase = ExercisePhase.waitingRest; // ست تموم شد → منتظر شروع استراحت
+          // currentSetIndex++;
+        });
+      }
+    });
+  }
+
+
+  void _onPause() {
+    _videoController?.pause();
+    _setTimer?.cancel();
+    _isPaused = true;
+    setState(() {});
+  }
+
+  void _onResume() {
+    _videoController?.play();
+    _isPaused = false;
+    _startResumeTimer();
+    setState(() {});
+  }
+
+  void _startResumeTimer() {
+    _setTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds > 0) {
+        setState(() {
+          remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        if (isResting) {
+          setState(() {
+            isResting = false;
+            currentSetIndex++;
+          });
+          _startSetCycle();
+        } else {
+          setState(() {
+            isResting = true;
+          });
+        }
+      }
+    });
+  }
+
+  void _goToNextVideo() {
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    if (currentVideoIndex < videos.length - 1) {
+      currentVideoIndex++;
+      _initializeVideo();
+    }
+  }
+
+
+
+
+  void _startRest(int restSeconds) {
+    setState(() {
+      _phase = ExercisePhase.resting;
+      remainingSeconds = restSeconds;
+    });
+
+    _setTimer?.cancel();
+    _setTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds > 0) {
+        setState(() {
+          remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          currentSetIndex++;
+          _phase = ExercisePhase.idle;
+        });
+      }
+    });
+  }
+
+
+  Future<void> _initializeVideo() async {
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    if (videos.isEmpty) return;
+
+    final currentVideo = videos[currentVideoIndex];
+    final videoPath = currentVideo["video_file"];
+
+    currentSetIndex = 0;
+    isResting = false;
+
+    // Dispose قبلی
+    _videoController?.dispose();
+    _chewieController?.dispose();
+
+    // کنترلر جدید
+    _videoController = VideoPlayerController.network(
+      // 'http://10.138.209.50$videoPath',
+      'https://www.w3schools.com/tags/mov_bbb.mp4',
+    );
+
+    await _videoController!.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController!,
+      autoPlay: false,
+      looping: false,
+      allowFullScreen: true,
+      allowMuting: true,
+      aspectRatio: _videoController!.value.aspectRatio,
+    );
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _setTimer?.cancel();
+    _videoController?.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+
+  void _onRestart() {
+    _setTimer?.cancel();
+    _isPaused = false;
+    isResting = false;
+
+    setState(() {
+      currentSetIndex = 0;
+      _phase = ExercisePhase.idle;
+      remainingSeconds = 0;
+    });
+
+    _videoController?.pause();
+    _videoController?.seekTo(Duration.zero);
+  }
+
+  void _startSetCycle() {
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    if (videos.isEmpty || currentVideoIndex >= videos.length) return;
+
+    final currentVideo = videos[currentVideoIndex];
+    final sets = currentVideo["sets"] as List<dynamic>;
+
+    if (currentSetIndex >= sets.length) {
+      _goToNextVideo();
+      return;
+    }
+
+    final currentSet = sets[currentSetIndex];
+    final int duration = currentSet["duration_seconds"];
+    final int rest = currentSet["rest_seconds"];
+
+    // شروع حرکت
+    remainingSeconds = duration;
+    _setTimer?.cancel();
+    _setTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (remainingSeconds > 0) {
+        setState(() {
+          remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          isResting = true;
+          remainingSeconds = rest;
+        });
+
+        // تایمر استراحت
+        _setTimer = Timer.periodic(const Duration(seconds: 1), (restTimer) {
+          if (remainingSeconds > 0) {
+            setState(() {
+              remainingSeconds--;
+            });
+          } else {
+            restTimer.cancel();
+            setState(() {
+              isResting = false;
+              currentSetIndex++;
+            });
+            _startSetCycle();
+          }
+        });
+      }
+    });
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    final videos = widget.exercise["videos"] as List<dynamic>;
+    final currentVideo = videos.isNotEmpty ? videos[currentVideoIndex] : null;
+    final sets = currentVideo != null ? currentVideo["sets"] as List<dynamic> : [];
+    final set_counts = sets.length;
+
+
+
+    final currentSet = (sets.isNotEmpty && currentSetIndex < sets.length)
+        ? sets[currentSetIndex]
+        : null;
+
+
+
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop){
+        print('onPopInvoked called, didPop: $didPop');
+        if (didPop) return;
+        print('Calling Navigator.pop with true');
+        Navigator.pop(context, true);
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFF3F6FB),
+                Color(0xFFFFD6D9),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  child: BackWidget(
+                    onPressed: ()=>{Navigator.pop(context, true)},
+                  ),
+                ),
+                // const SizedBox(height: 8,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(widget.exercise["name"], style:
+                  TextStyle(
+                    color: Color(0xFF1B1B1B),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),),
+                ),
+
+                //   show sets
+                const SizedBox(height: 16,),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(sets.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: _buildQuarterButton(
+                          "ست ${index + 1}",
+                          enabled: index == currentSetIndex,
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+
+                const SizedBox(height: 16,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text("حرکت ${currentVideo?["title"] ?? ""}", style:
+                  TextStyle(
+                    color: Color(0xFF5C272A),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),),
+                ),
+                const SizedBox(height: 24,),
+                // --- Video Preview ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: AspectRatio(
+                    aspectRatio: _videoController?.value.isInitialized == true
+                        ? _videoController!.value.aspectRatio
+                        : 16 / 9,
+                    child: _chewieController != null
+                        ? Chewie(controller: _chewieController!)
+                        : const Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+
+                const SizedBox(height: 24,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20,),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Color(0xFF8D8D8D), width: 1)
+                    ),
+                    child: Text(widget.exercise["description"]),
+                  ),
+                ),
+                const SizedBox(height: 16,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20,),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "$remainingSeconds''",
+                        style: const TextStyle(
+                          color: Color(0xFF92373C),
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+
+
+                      const SizedBox(width: 8,),
+                      Image.asset("assets/icons/Clock.png", width: 24, height: 24,),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // --- Buttons ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+
+                      // --- وقتی در حال ست هستیم ---
+                      if (_phase == ExercisePhase.runningSet) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFFBE5258), width: 1),
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: _isPaused ? _onResume : _onPause,
+                                child: Text(
+                                  _isPaused ? "ادامه" : "توقف",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFBE5258),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF9F9F9),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(color: Colors.white, width: 1),
+                                  ),
+                                ),
+                                onPressed: _onRestart,
+                                child: const Text(
+                                  "شروع مجدد",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFBE5258),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ]
+
+                      // --- وقتی آماده شروع یک ست هستیم ---
+                      else if (_phase == ExercisePhase.idle) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFBE5258),
+                              padding: const EdgeInsets.symmetric(vertical: 17),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: _onStart, // ست جدید
+                            child: const Text(
+                              "شروع ست",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]
+
+                      // --- وقتی ست تموم شده و باید استراحت شروع بشه ---
+                      else if (_phase == ExercisePhase.waitingRest) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Color(0xFFf9f9f9), // پس زمینه
+                                side: BorderSide(color: Color(0xFF52BEB8), width: 1), // border
+                                padding: const EdgeInsets.symmetric(vertical: 17),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () => _startRest(
+                                (widget.exercise["videos"][currentVideoIndex]["sets"][currentSetIndex]["rest_seconds"]) ?? 10,
+                              ),
+                              child: Text(
+                                "شروع استراحت",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF52BEB8), // رنگ متن
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
+
+                        // --- وقتی توی استراحت هستیم ---
+                        else if (_phase == ExercisePhase.resting) ...[
+                            Text(
+                              "$remainingSeconds''",
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF37928d),
+                              ),
+                            ),
+                          ]
+
+                          // --- وقتی آخرین ست یک ویدیو تموم شده و باید ویدیوی بعدی شروع بشه ---
+                          else if (_phase == ExercisePhase.videoRest) ...[
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    padding: const EdgeInsets.symmetric(vertical: 17),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: _goToNextVideo,
+                                  child: const Text(
+                                    "شروع ویدیوی بعدی",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+
+                    ],
+                  ),
+                )
+
+              ],
+            ),
+          ),
+
+        ),
+      ),
+    );
+  }
+  Widget _buildQuarterButton(String text, {bool enabled = true}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 15),
+      decoration: BoxDecoration(
+        color: enabled ? Colors.white : const Color(0xFFEDEDED),
+        borderRadius: BorderRadius.circular(8),
+        border: enabled
+            ? Border.all(color: const Color(0xFFF2E3E4), width: 1)
+            : null,
+        boxShadow: enabled
+            ? [
+          BoxShadow(
+            color: const Color(0xFF8B9EB8).withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ]
+            : null,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          color: enabled ? const Color(0xFFBE5258) : const Color(0xFFADADAD),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}

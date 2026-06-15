@@ -1,0 +1,259 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/noBG.png' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <title>مام فیت | همراه مطمئن در بارداری سالم</title>
+  </head>
+  <body>
+    {% comment %} navigation section {% endcomment %}
+    <nav class="sticky top-0 z-50 bg-white/30 backdrop-blur-xl shadow-[0_2px_10px_rgba(0,0,0,0.08)] mb-[40px]">
+      <div class="w-[90%] mx-auto flex justify-between items-center py-[16px]">
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+          <img src="{% static 'images/logo.png' %}" class="w-[50px]" alt="" />
+          <h5 class="max-md:hidden text-[#BE5258] text-[28px] shabnamBold">مام فیت</h5>
+        </div>
+
+        <!-- Hamburger Button (Mobile Only) -->
+        <button class="md:hidden text-[#BE5258] cursor-pointer" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-[32px] text-[20px] text-[#383838] shabnamBold">
+          <a href="#home" class="hover:text-[#BE5258] transition">خانه</a>
+          <a href="#features" class="hover:text-[#BE5258] transition">ویژگی‌ها</a>
+          <a href="#sutable" class="hover:text-[#BE5258] transition">مناسب برای</a>
+          <a href="#sutable" class="hover:text-[#BE5258] transition">مقالات</a>
+          {% comment %} <a href="#download" class="hover:text-[#BE5258] transition">سوالات متداول</a> {% endcomment %}
+        </div>
+
+        <!-- Desktop Download Button -->
+        <a href="{% static 'android/mom_fit.apk' %}" download class="hidden md:block w-fit bg-[#BE5258] text-[#F7EEEE] shabnamBold text-[20px] rounded-[12px] px-[16px] py-[8px] hover:bg-[#92373C] transition">دانلود مام فیت</a>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden bg-white/20 backdrop-blur-xl border-t border-white/40">
+        <ul class="flex flex-col items-center px-6 py-4 gap-4 text-[18px] text-[#383838] shabnamBold">
+          <a href="#home" class="hover:text-[#BE5258] transition">خانه</a>
+          <a href="#features" class="hover:text-[#BE5258] transition">ویژگی‌ها</a>
+          <a href="#sutable" class="hover:text-[#BE5258] transition">مناسب برای</a>
+          <a href="#sutable" class="hover:text-[#BE5258] transition">مقالات</a>
+          {% comment %} <a href="#download" class="hover:text-[#BE5258] transition">سوالات متداول</a> {% endcomment %}
+
+          <!-- Mobile Download Button -->
+          <a href="{% static 'android/mom_fit.apk' %}" download class="mt-2 w-full text-center bg-[#BE5258] text-[#F7EEEE] shabnamBold text-[20px] rounded-[12px] py-[10px] hover:bg-[#92373C] transition">دانلود مام فیت</a>
+        </ul>
+      </div>
+    </nav>
+
+    {% comment %}Hero section{% endcomment %}
+    <section id="home" class="hero-section flex justify-center mb-[50px]">
+      <div class="md:grid md:grid-cols-3 w-[90%] items-center">
+        <div class="animate__animated animate__zoomIn">
+          <h1 class="text-[28px] md:text-[40px] max-md:text-center text-[#92373C] shabnamBold">مام فیت</h1>
+          <h1 class="text-[20px] md:text-[40px] max-md:text-center text-[#2B1213] shabnamBold mt-3 mb-[52px]">همراه مطمئن شما در مسیر یک بارداری سالم</h1>
+          <p class="text-[#545454] text-[16px] md:text-[20px] shabnamBold text-justify">با برنامه‌های تمرینی ایمن، تخصصی و مرحله‌به‌مرحله برای هر سه‌ماهه بارداری؛ طراحی‌شده زیر نظر مربیان و متخصصان سلامت مادر.</p>
+          <div>
+            <div class="max-md:flex max-md:justify-center mb-[32px]">
+              <a href="{% static 'android/mom_fit.apk' %}" download class="w-fit text-center bg-[#BE5258] text-[#F7EEEE] shabnamBold text-[24px] rounded-full px-[24px] py-[12px] mt-[40px] hover:bg-[#92373C] transition duration-300 flex items-center gap-[12px] cursor-pointer">
+                <img src="{% static 'images/Download.svg' %}" class="w-[20px]" alt="" />
+                دانلود مام فیت
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center">
+          <img src="{% static 'images/hero1.png' %}" class="w-[75%]" alt="" />
+        </div>
+        <div class="animate__animated animate__zoomIn max-md:hidden">
+          <img src="{% static 'images/hero2.png' %}" class="w-[75%]" alt="" />
+        </div>
+      </div>
+    </section>
+
+    {% comment %}fetures{% endcomment %}
+    <section id="features" class="fetures-section bg-[#F7F7F7] py-[70px]">
+      <div class="w-[90%] mx-auto">
+        {% comment %}titles{% endcomment %}
+        <div class="text-center pb-[48px]">
+          <h3 class="shabnamBold text-[28px] text-[#A63A43]">ویژگی های مام فیت</h3>
+          <h2 class="text-[20px] md:text-[32px] shabnamBold text-[#0F172A] my-[20px]">هر آنچه برای یک بارداری سالم نیاز دارید</h2>
+          <p class="text-[18px] md:text-[20px] text-[#64748B]">مام فیت اپلیکیشنی است که با در نظر گرفتن نیازهای بدنی مادران در دوران بارداری، برنامه‌های تمرینی استاندارد و قابل اعتماد ارائه می‌دهد. تمرین‌ها کاملاً مطابق ماه بارداری، شرایط جسمی و سطح آمادگی شما تنظیم می‌شوند.</p>
+        </div>
+
+        {% comment %}boxes{% endcomment %}
+        <div class="md:grid md:grid-cols-2 lg:grid-cols-3 gap-[40px]">
+          <div class="feture-box bg-[#F7EEEE] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#F6E7E7] p-3 shadow-xl/5 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/Meditation.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">بدون نیاز به تجهیزات خاص</h3>
+              <p class="text-[16px] text-[#475569]">برنامه‌ها مطابق تغییرات بدنی مادر طراحی شده و هیچ حرکت خطرناکی در آنها وجود ندارد.</p>
+            </div>
+          </div>
+
+          <div class="feture-box bg-[#EEF7F6] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#CDE8E6] p-3 shadow-xl/5 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/video.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">ویدیوهای آموزشی با کیفیت بالا</h3>
+              <p class="text-[16px] text-[#475569]">تمام تمرین‌ها توسط مربی حرفه‌ای، آهسته و مرحله‌به‌مرحله توضیح داده شده‌اند تا بتوانید در خانه به‌راحتی انجام دهید.</p>
+            </div>
+          </div>
+
+          <div class="feture-box bg-[#F7EEEE] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#F6E7E7] p-3 shadow-xl/10 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/dambel.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">تمرینات تخصصی هر سه‌ماهه بارداری</h3>
+              <p class="text-[16px] text-[#475569]">برنامه‌ها مطابق تغییرات بدنی مادر طراحی شده و هیچ حرکت خطرناکی در آنها وجود ندارد.</p>
+            </div>
+          </div>
+
+          <div class="feture-box bg-[#EEF7F6] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#CDE8E6] p-3 shadow-xl/5 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/electron.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">نکات تخصصی</h3>
+              <p class="text-[16px] text-[#475569]">توصیه‌های روزانه در مورد وضعیت بدن، تنفس و سلامتی برای آماده شدن برای زایمان را دریافت کنید.</p>
+            </div>
+          </div>
+
+          <div class="feture-box bg-[#F7EEEE] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#F6E7E7] p-3 shadow-xl/10 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/calender.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">تقویم تمرینی هوشمند</h3>
+              <p class="text-[16px] text-[#475569]">برنامه خودکار پیش می‌رود و به شما کمک می‌کند بین تمرین و استراحت، تعادل سالمی داشته باشید.</p>
+            </div>
+          </div>
+
+          <div class="feture-box bg-[#EEF7F6] shadow-sm rounded-[8px] p-2 border border-[#F1F5F9] pb-6 max-md:mb-[20px]">
+            {% comment %}icon{% endcomment %}
+            <div>
+              <div class="bg-[#CDE8E6] p-3 shadow-xl/5 rounded-[12px] w-fit mx-[16px] my-[5px]">
+                <img src="{% static 'images/tick.svg' %}" class="w-[24px]" alt="" />
+              </div>
+              <h3 class="shabnamBold text-[20px] text-[#0F172A] my-[24px]">کاملاً ایمن برای مادر و جنین</h3>
+              <p class="text-[16px] text-[#475569]">تمام محتوا زیر نظر متخصصین تناسب‌ اندام دوران بارداری تهیه شده است.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% comment %}sutable section{% endcomment %}
+    <section id="sutable" class="sutable-persons bg-white pt-[70px] pb-[30px] shadow-sm">
+      <div class="w-[90%] mx-auto">
+        <div class="md:grid md:grid-cols-2">
+          <div class="">
+            <h3 class="shabnamBold text-[22px] md:text-[32px] text-[#5C272A] mb-[45px]">این نرم افزار برای چه کسانی مناسب است؟</h3>
+
+            <div>
+              <div class="flex items-center gap-[24px] mb-[32px]">
+                <div class="w-[48px] h-[48px] rounded-full bg-[#FDF2F3] flex justify-center items-center">
+                  <img src="{% static 'images/heart.svg' %}" class="w-[24px] h-[24px]" alt="" />
+                </div>
+                <p class="shabnamBold text-[18px] md:text-[20px] text-[#383838]">مادرانی که تازه وارد دوران بارداری شده‌اند</p>
+              </div>
+              <div class="flex items-center gap-[24px] mb-[32px]">
+                <div class="w-[48px] h-[48px] rounded-full bg-[#FDF2F3] flex justify-center items-center">
+                  <img src="{% static 'images/heart.svg' %}" class="w-[24px] h-[24px]" alt="" />
+                </div>
+                <p class="shabnamBold text-[18px] md:text-[20px] text-[#383838]">کسانی که به‌دنبال ورزش ایمن و کنترل‌شده هستند</p>
+              </div>
+              <div class="flex items-center gap-[24px] mb-[32px]">
+                <div class="w-[48px] h-[48px] rounded-full bg-[#FDF2F3] flex justify-center items-center">
+                  <img src="{% static 'images/heart.svg' %}" class="w-[24px] h-[24px]" alt="" />
+                </div>
+                <p class="shabnamBold text-[18px] md:text-[20px] text-[#383838]">مادرانی که می‌خواهند وزن‌گیری سالم داشته باشند</p>
+              </div>
+              <div class="flex items-center gap-[24px] mb-[32px]">
+                <div class="w-[48px] h-[48px] rounded-full bg-[#FDF2F3] flex justify-center items-center">
+                  <img src="{% static 'images/heart.svg' %}" class="w-[24px] h-[24px]" alt="" />
+                </div>
+                <p class="shabnamBold text-[18px] md:text-[20px] text-[#383838]">خانم‌هایی که دچار کمر درد، لگن درد یا بی‌حالی دوران بارداری هستند</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-md:hidden">
+            <img src="{% static 'images/sutable.png' %}" alt="" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% comment %}install mom-fit{% endcomment %}
+    <section class="install-momfit bg-[#BE5258] pt-[60px] pb-[40px] mt-[20px]">
+      <div class="w-[90%] mx-auto text-center">
+        <h2 class="shabnamBold text-[30px] md:text-[48px] text-[#EEF7F6] mb-[32px]">همین حالا مام فیت را نصب کن</h2>
+        <p class="text-[20px] md:text-[32px] text-[#E3E3E3] mb-[32px]">با مام فیت، بارداری را سالم‌تر، آرام‌تر و پرانرژی‌تر تجربه کن.</p>
+        <a href="{% static 'android/mom_fit.apk' %}" download class="w-fit text-center bg-white text-[#BE5258] shabnamBold text-[18px] md:text-[24px] rounded-full px-[24px] py-[12px] hover:bg-[#F1F5F9] transition duration-300 flex items-center gap-[17px] cursor-pointer mx-auto">
+          <img src="{% static 'images/red-download.svg' %}" class="w-[16px] md:w-[20px]" alt="" />
+          دانلود مستقیم مام فیت
+        </a>
+      </div>
+    </section>
+
+
+    <footer class="w-[90%] mx-auto bg-white py-[60px]">
+      <div class="md:flex md:justify-between md:items-center">
+        <div>
+          {% comment %}right side footer{% endcomment %}
+          <div class="flex items-center gap-[22px] mb-[24px]">
+            <img src="{% static 'images/momfitlogo.png' %}" class="w-[80px] h-[80px]" alt="" />
+            <h5 class="text-[#BE5258] text-[40px] shabnamBold">مام فیت</h5>
+          </div>
+
+          <p class="text-[16px] md:text-[20px] text-[#717171] md:w-[370px]">توانمندسازی مادران با برنامه‌های ورزشی ایمن، مؤثر و در دسترس.</p>
+        </div>
+
+        {% comment %}left side footer{% endcomment %}
+        <div>
+          <h5 class="max-md:mt-[30px] text-[#383838] text-[20px] mb-[16px]">ارتباط با ما</h5>
+          <div class="flex items-center gap-[16px] mb-[12px]">
+            <div class="flex items-center gap-[8px]">
+              <img src="{% static 'images/call.svg' %}" class="w-[20px] h-[20px]" alt="" />
+              <p class="text-[16px] text-[#383838 ]">شماره تماس:</p>
+            </div>
+            <p class="text-[#92373C] text-[16px]" style="direction: ltr;">+۹۸ ۹۲۲ ۴۸۵ ۰۱۹۶</p>
+          </div>
+          <div class="flex items-center gap-[16px] mb-[12px]">
+            <div class="flex items-center gap-[8px]">
+              <img src="{% static 'images/sms.svg' %}" class="w-[20px] h-[20px]" alt="" />
+              <p class="text-[16px] text-[#383838 ]">ایمیل:</p>
+            </div>
+            <p class="text-[#92373C] text-[16px]" style="direction: ltr;">mom.fit.app@gmail.com</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <div class="text-center p-2">
+      <p class="text-[14px] text-[#717171]">
+        تمامی حقوق این سایت و نرم افزار متعلق به گروه فناوری <span class="shabnamBold text-[#92373C]">هومان</span> میباشد.
+      </p>
+    </div>
+  </body>
+</html>

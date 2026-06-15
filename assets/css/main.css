@@ -1,0 +1,27 @@
+@font-face {
+    font-family: shabnam;
+    src: url("../fonts/Shabnam-Medium-FD.ttf");
+}
+
+@font-face {
+    font-family: shabnamBold;
+    src: url("../fonts/Shabnam-Bold-FD.ttf");
+}
+html {
+    scroll-behavior: smooth;
+}
+
+body{
+    /* background: linear-gradient(to bottom, #FEC0BF, #ffffff); */
+    background-color: white;
+    font-family: shabnam, sans-serif;
+    direction: rtl;
+}
+
+.shabnam{
+    font-family: shabnam;
+}
+
+.shabnamBold{
+    font-family: shabnamBold;
+}
